@@ -1,0 +1,20 @@
+{
+  "name": "conda-devcontainer",
+  "build": {
+    "dockerfile": "../Dockerfile"
+  },
+ 
+  "postCreateCommand": "echo 'Dev container ready!'",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-toolsai.jupyter"
+      ],
+
+       "settings": {
+    "python.defaultInterpreterPath": "/opt/conda/envs/ml-env/bin/python"
+  }
+    }
+  }
+}
