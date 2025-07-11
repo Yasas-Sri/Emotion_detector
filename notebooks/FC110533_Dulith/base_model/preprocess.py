@@ -7,7 +7,7 @@ import pickle
 IMAGE_SIZE = (128, 128)
 TRAIN_PATH = "/workspaces/Emotion_detector/Data/images/train"
 VAL_PATH = "/workspaces/Emotion_detector/Data/images/validation"
-SAVE_DIR = "p/workspaces/Emotion_detector/notebooks/FC110533_Dulith/base_model/preprocessed_data"
+SAVE_DIR = "/workspaces/Emotion_detector/notebooks/FC110533_Dulith/base_model/preprocessed_data"
 
 def process_and_save_images(base_path, save_dir):
     os.makedirs(save_dir, exist_ok=True)
