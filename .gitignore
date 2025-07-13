@@ -180,4 +180,4 @@ pyrightconfig.json
 
 /workspaces/Emotion_detector/notebooks/FC110533_Dulith/base_model/preprocessed_data
 
-/workspaces/Emotion_detector/notebooks/FC110532_Haritha/base_model/preprocessed_data                             *.npy
+/workspaces/Emotion_detector/notebooks/FC110532_Haritha/base_model/preprocessed_data                             
