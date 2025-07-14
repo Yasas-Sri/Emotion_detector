@@ -1,11 +1,26 @@
 # Use Miniconda as base image
 FROM continuumio/miniconda3
 
+
+# Install system-level dependencies needed for OpenCV
+RUN apt-get update && apt-get install -y \
+    libgl1 \
+    libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender-dev\
+    && rm -rf /var/lib/apt/lists/* 
+
+
+
 # Create a working directory
 WORKDIR /app
 
 # Copy requirements (if using pip-based install)
 COPY requirements.txt .
+
+
+
 
 # Create conda env, install Jupyter, and register kernel
 RUN conda create -n ml-env python=3.9 -y && \

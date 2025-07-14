@@ -3,7 +3,9 @@
   "build": {
     "dockerfile": "../Dockerfile"
   },
- 
+  "runArgs": [
+    "--device=/dev/video0"
+  ],
   "postCreateCommand": "echo 'Dev container ready!'",
   "customizations": {
     "vscode": {
@@ -11,10 +13,9 @@
         "ms-python.python",
         "ms-toolsai.jupyter"
       ],
-
-       "settings": {
-    "python.defaultInterpreterPath": "/opt/conda/envs/ml-env/bin/python"
-  }
+      "settings": {
+        "python.defaultInterpreterPath": "/opt/conda/envs/ml-env/bin/python"
+      }
     }
   }
 }
