@@ -1,16 +1,28 @@
-# train.py
-
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 import joblib
 import os
+import sys
 
-from preprocess import get_datasets
+from preprocess import get_datasets, get_feature_datasets
 
 MODEL_PATH = "./models/model.pkls"
 
-X_train, y_train, X_val, y_val, label_encoder = get_datasets()
+print("Select input mode:")
+print("1. Train using image data")
+print("2. Train using extracted features from CSV files")
+mode = input("Enter 1 or 2: ").strip()
+
+if mode == "1":
+    X_train, y_train, X_val, y_val, label_encoder = get_datasets()
+elif mode == "2":
+    train_csv_path = input("Enter path to train CSV (default: ./train_features.csv): ").strip() or "./train_features.csv"
+    val_csv_path = input("Enter path to validation CSV (default: ./validation_features.csv): ").strip() or "./validation_features.csv"
+    X_train, y_train, X_val, y_val, label_encoder = get_feature_datasets(train_csv_path, val_csv_path)
+else:
+    print("Invalid mode. Exiting.")
+    sys.exit(1)
 
 print("Training RF")
 rf = RandomForestClassifier(

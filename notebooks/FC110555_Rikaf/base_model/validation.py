@@ -3,12 +3,26 @@ import joblib
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-from preprocess import get_datasets
+from preprocess import get_datasets, get_feature_datasets
 
 
 MODEL_PATH = "./models/model.pkls"
 
-_, _, X_val, y_val, label_encoder = get_datasets()
+print("Select input mode:")
+print("1. Validate using image data")
+print("2. Validate using extracted features from CSV files")
+mode = input("Enter 1 or 2: ").strip()
+
+if mode == "1":
+    _, _, X_val, y_val, label_encoder = get_datasets()
+elif mode == "2":
+    val_csv_path = input("Enter path to validation CSV (default: ./validation_features.csv): ").strip() or "./validation_features.csv"
+    train_csv_path = input("Enter path to training CSV (default: ./train_features.csv): ").strip() or "./train_features.csv"
+    _, _, X_val, y_val, label_encoder = get_feature_datasets(train_csv_path, val_csv_path)
+else:
+    print("Invalid mode. Exiting.")
+    exit(1)
+
 
 model = joblib.load(MODEL_PATH)
 
