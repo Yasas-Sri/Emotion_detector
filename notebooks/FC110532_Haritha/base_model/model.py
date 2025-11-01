@@ -1,7 +1,7 @@
 import tensorflow as tf
 from tensorflow.keras import layers, models
 
-def create_mini_xception(input_shape=(64, 64, 1), num_classes=7):
+def create_mini_xception(input_shape=(48, 48, 1), num_classes=7):
     """
     Mini Xception model for emotion detection
     """
