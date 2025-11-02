@@ -176,7 +176,7 @@ pyrightconfig.json
 # Machine Learning Models
 *.pkls
 
-
+.vs
 
 # End of https://www.toptal.com/developers/gitignore/api/python
 
