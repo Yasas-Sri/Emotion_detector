@@ -1,4 +1,4 @@
-# 🎭 Real-Time Emotion Detection System
+#  Real-Time Emotion Detection System
 
 A sophisticated real-time emotion detection application that uses computer vision and deep learning to detect faces and classify emotions, providing personalized movie and book recommendations based on detected mood and live emotion graph
 
@@ -12,7 +12,7 @@ A sophisticated real-time emotion detection application that uses computer visio
 - [API Keys](#api-keys)
 - [Development](#development)
 - [Docker Deployment](#docker-deployment)
-- [Contributing](#contributing)
+  
 
 ##  Features
 
@@ -293,7 +293,7 @@ The emotion detection models are trained on standard emotion recognition dataset
 
 ##  License
 
-[Add your license here]
+[LICENSE](LICENSE)
 
 ##  Authors
 
