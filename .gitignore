@@ -176,7 +176,7 @@ pyrightconfig.json
 # Machine Learning Models
 *.pkls
 
-.vs
+
 
 # End of https://www.toptal.com/developers/gitignore/api/python
 
@@ -187,4 +187,5 @@ pyrightconfig.json
 train_features.csv
 validation_features.csv
 /workspaces/Emotion_detector/notebooks/FC110533_Dulith/base_model/preprocessed_data
+
 
