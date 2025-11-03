@@ -11,9 +11,7 @@ A sophisticated real-time emotion detection application that uses computer visio
 - [Models](#models)
 - [API Keys](#api-keys)
 - [Development](#development)
-- [Docker Deployment](#docker-deployment)
   
-
 ##  Features
 
 ### Core Functionality
@@ -196,7 +194,6 @@ Emotion_detector/
 
 #### Keras Models (.h5 / .keras)
 - **Mini-Xception**: Lightweight architecture optimized for emotion recognition(both pretrained and custom)
-- **EfficientNetB0**: Transfer learning from ImageNet
 - **MobileNet**: Mobile-optimized architecture
 - **VGG**: Classic deep CNN architecture
 - **ResNet**: Residual network (small variant for 48×48 images)
@@ -231,16 +228,6 @@ No API key required - uses public Open Library API
 
 ##  Development
 
-### Running Tests
-
-```bash
-# Run unit tests
-pytest tests/
-
-# Run with coverage
-pytest --cov=src tests/
-```
-
 ### Adding New Models
 
 1. Place model file in [`models/`](models/) directory
@@ -254,26 +241,7 @@ pytest --cov=src tests/
 - [`YuNetFaceDetector`](src/detectors/haar_detector.py): YuNet DNN implementation
 - [`ViTEmotionModel`](src/detectors/vit_detector.py): Vision Transformer wrapper
 
-##  Docker Deployment
 
-### Build and Run
-
-```bash
-# Build image
-docker build -t emotion-detector:latest .
-
-# Run with GPU support (optional)
-docker run --gpus all -p 8501:8501 \
-  --device=/dev/video0 \
-  -e TMDB_API_KEY=your_key \
-  emotion-detector:latest
-
-# Run without GPU
-docker run -p 8501:8501 \
-  --device=/dev/video0 \
-  -e TMDB_API_KEY=your_key \
-  emotion-detector:latest
-```
 
 ### Environment Variables
 
@@ -312,4 +280,4 @@ The emotion detection models are trained on standard emotion recognition dataset
 - Hugging Face Transformers for ViT implementation
 
 
-**Note**: This project requires a webcam for real-time emotion detection. Ensure camera permissions are granted in your browser.o
+**Note**: This project requires a webcam for real-time emotion detection. Ensure camera permissions are granted in your browser
