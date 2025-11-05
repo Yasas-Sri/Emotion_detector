@@ -2,29 +2,56 @@ from sklearn.metrics import accuracy_score, confusion_matrix, classification_rep
 import joblib
 import matplotlib.pyplot as plt
 import seaborn as sns
+import numpy as np
+import pandas as pd
+from sklearn.ensemble import RandomForestClassifier
 
-from preprocess import get_datasets, get_feature_datasets
-
+from preprocess import get_feature_datasets
 
 MODEL_PATH = "./models/model.pkls"
+TRAIN_CSV_PATH = "./train_features.csv"
+VAL_CSV_PATH = "./validation_features.csv"
 
-print("Select input mode:")
-print("1. Validate using image data")
-print("2. Validate using extracted features from CSV files")
-mode = input("Enter 1 or 2: ").strip()
+print("Loading feature datasets...")
+# Load the full datasets first
+_, _, X_val_full, y_val, label_encoder = get_feature_datasets(TRAIN_CSV_PATH, VAL_CSV_PATH)
 
-if mode == "1":
-    _, _, X_val, y_val, label_encoder = get_datasets()
-elif mode == "2":
-    val_csv_path = input("Enter path to validation CSV (default: ./validation_features.csv): ").strip() or "./validation_features.csv"
-    train_csv_path = input("Enter path to training CSV (default: ./train_features.csv): ").strip() or "./train_features.csv"
-    _, _, X_val, y_val, label_encoder = get_feature_datasets(train_csv_path, val_csv_path)
-else:
-    print("Invalid mode. Exiting.")
-    exit(1)
+# --- CRITICAL ADDITION: REPLICATE FEATURE SELECTION ---
+# You MUST use the same training data to determine feature importance.
+# This ensures you select the SAME features.
+print("Loading training data to replicate feature selection...")
+train_df = pd.read_csv(TRAIN_CSV_PATH)
+y_train_for_selection = train_df["label"].values
+X_train_full_for_selection = train_df.drop(columns=["label"]).values
+
+# Apply the same feature engineering from preprocess.py
+from preprocess import engineer_features
+X_train_engineered = np.array([engineer_features(x) for x in X_train_full_for_selection])
+
+print("Running quick RF to determine feature importances...")
+quick_rf = RandomForestClassifier(n_estimators=100, random_state=42, n_jobs=-1)
+quick_rf.fit(X_train_engineered, y_train_for_selection)
+
+# Select the SAME top 200 features
+importances = quick_rf.feature_importances_
+top_200_indices = np.argsort(importances)[-50:]
+
+# Apply the selection to the VALIDATION data
+X_val = X_val_full[:, top_200_indices]
+print(f"Reduced validation feature shape to: {X_val.shape}")
+# --- END CRITICAL ADDITION ---
 
 
 model = joblib.load(MODEL_PATH)
+
+# Feature importance analysis (now on the 200 features)
+feature_importance = model.feature_importances_
+top_10_indices_in_reduced = np.argsort(feature_importance)[-10:]
+print("\n--- Feature Importance (on reduced set) ---")
+print("Top 10 most important features (indices):")
+for idx in top_10_indices_in_reduced:
+    print(f"  Feature {idx}: {feature_importance[idx]:.4f}")
+print("-------------------------\n")
 
 y_pred = model.predict(X_val)
 
