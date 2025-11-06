@@ -1,7 +1,6 @@
 import os
 import cv2
 import mediapipe as mp
-import numpy as np
 import csv
 import argparse
 from sklearn.model_selection import train_test_split
@@ -62,7 +61,7 @@ def process_and_write_csv(image_paths, labels, output_csv, include_label):
         return processed_count, skipped_count
 
 def main():
-    parser = argparse.ArgumentParser(description='Extract and split facial landmarks into train, validation, and test CSVs.')
+    parser = argparse.ArgumentParser()
 
     parser.add_argument('--source-folder', type=str, required=True)
     parser.add_argument('--output-dir', type=str, default='./')
@@ -79,12 +78,13 @@ def main():
 
     os.makedirs(args.output_dir, exist_ok=True)
     
-    print("--- Step 1: Collecting all image paths and labels ---")
+    print("--- Collecting all image paths and labels ---")
     all_image_paths = []
     all_labels = []
     for label in os.listdir(args.source_folder):
         label_path = os.path.join(args.source_folder, label)
-        if not os.path.isdir(label_path): continue
+        if not os.path.isdir(label_path): 
+            continue
         
         for img_name in os.listdir(label_path):
             if img_name.lower().endswith((".png", ".jpg", ".jpeg")):
@@ -93,7 +93,7 @@ def main():
     
     print(f"Found {len(all_image_paths)} images across {len(set(all_labels))} classes.")
 
-    print("\n--- Step 2: Splitting data into Train, validation, and Test sets ---")
+    print("\n--- Splitting data into Train, validation, and Test sets ---")
     X_trainval, X_test, y_trainval, y_test = train_test_split(
         all_image_paths, all_labels, 
         test_size=args.test_size, 
@@ -114,7 +114,7 @@ def main():
     print(f"  Validation: {len(X_val)} images")
     print(f"  Test: {len(X_test)} images")
 
-    print("\n--- Step 3: Extracting features and writing to CSVs ---")
+    print("\n--- Extracting features and writing to CSVs ---")
     train_csv_path = os.path.join(args.output_dir, "train_features.csv")
     val_csv_path = os.path.join(args.output_dir, "validation_features.csv")
     test_csv_path = os.path.join(args.output_dir, "test_features.csv")
@@ -124,13 +124,6 @@ def main():
     process_and_write_csv(X_val, y_val, val_csv_path, args.include_label)
 
     process_and_write_csv(X_test, y_test, test_csv_path, args.include_label)
-
-    print("\n--- Extraction and Splitting Summary --")
-    print(f"Training data:   -> {train_csv_path}")
-    print(f"Validation data: -> {val_csv_path}")
-    print(f"Test data:       -> {test_csv_path}")
-    print("------------------")
-
 
 if __name__ == "__main__":
     main()

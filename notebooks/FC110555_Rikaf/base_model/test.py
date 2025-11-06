@@ -1,10 +1,7 @@
-from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report, f1_score
 import joblib
 import matplotlib.pyplot as plt
 import seaborn as sns
-import numpy as np
-import pandas as pd
-from sklearn.ensemble import RandomForestClassifier
 
 from preprocess import get_feature_datasets
 
@@ -15,23 +12,27 @@ TEST_CSV_PATH = "./test_features.csv"
 print("Loading datasets for final testing...")
 X_train_full, y_train_full, X_test_full, y_test, label_encoder = get_feature_datasets(TRAIN_CSV_PATH, TEST_CSV_PATH)
 
-print("Replicating feature selection using training data...")
-quick_rf = RandomForestClassifier(n_estimators=100, random_state=42, n_jobs=-1)
-quick_rf.fit(X_train_full, y_train_full)
-
-importances = quick_rf.feature_importances_
-top_200_indices = np.argsort(importances)[-50:]
-
-X_test = X_test_full[:, top_200_indices]
-print(f"Reduced test feature shape to: {X_test.shape}")
-# --- END CRITICAL ADDITION ---
-
+# Load the final, trained model
 model = joblib.load(MODEL_PATH)
+print(f"Model loaded. Expected feature count: {model.n_features_in_}")
+print(f"Actual test feature count: {X_test_full.shape[1]}")
+
+if model.n_features_in_ != X_test_full.shape[1]:
+    raise ValueError(
+        f"CRITICAL ERROR: Feature mismatch! The model was trained with {model.n_features_in_} features, "
+        f"but the test data has {X_test_full.shape[1]} features. "
+        "Your training and testing pipelines are catastrophically out of sync."
+    )
+
+X_test = X_test_full
 
 y_pred = model.predict(X_test)
 
+# Report the FINAL metrics. This is it. No more changes.
 acc = accuracy_score(y_test, y_pred)
-print(f"\n=== FINAL TEST ACCURACY: {acc * 100:.2f}% ===\n")
+f1 = f1_score(y_test, y_pred, average='macro')
+print(f"\n=== FINAL TEST ACCURACY: {acc * 100:.2f}% ===")
+print(f"=== FINAL TEST MACRO F1-SCORE: {f1:.4f} ===\n")
 
 print("Final Classification Report:")
 print(classification_report(y_test, y_pred, target_names=label_encoder.classes_))
