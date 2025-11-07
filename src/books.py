@@ -148,16 +148,151 @@ def recommend_books_from_probs(
         ranked.append(d)
     return ranked[:20]
 
-def show_books(books: List[dict], ncols: int = 4):
-    cols = st.columns(ncols)
-    for i, b in enumerate(books):
-        with cols[i % ncols]:
-            if b.get("_cover"):
-                st.image(b["_cover"], use_container_width=True)
-            title = b.get("title", "(no title)")
-            authors = ", ".join(b.get("author_name", [])[:2])
-            yr = b.get("first_publish_year", "")
-            st.markdown(f"**{title}**")
-            st.caption(f"{authors} • {yr} • {b.get('_subjects','')}")
-            if b.get("_work_url"):
-                st.markdown(f"[Open Library]({b['_work_url']})")
+def show_books(books: List[dict]):
+    st.markdown("""
+    <style>
+    .books-section {
+        width: 100%;
+        margin-top: 20px;
+    }
+
+    .section-title {
+        text-align: center;
+        font-size: 22px;
+        font-weight: bold;
+        margin-bottom: 8px;
+        color: #222;
+    }
+
+    .section-divider {
+        height: 2px;
+        width: 100%;
+        background: linear-gradient(to right, #28a74540, #28a74590, #28a74540);
+        margin-bottom: 20px;
+        border-radius: 2px;
+    }
+
+    .book-list {
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+        padding: 10px;
+        width: 100%;
+    }
+
+    .book-card {
+        display: flex;
+        flex-direction: row;
+        background-color: #f9f9f9;
+        border-radius: 16px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        overflow: hidden;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+        width: 100%;
+    }
+
+    .book-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+    }
+
+    .book-cover {
+        flex: 0 0 100px;         /* cover width */
+        height: 200px;           /* cover height */
+        object-fit: cover;
+    }
+
+    .book-content {
+        flex: 1;
+        padding: 10px 14px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .book-title {
+        font-weight: 700;
+        font-size: 16px;
+        color: #111;
+        margin-bottom: 4px;
+    }
+
+    .book-info {
+        color: #444;
+        font-size: 13px;
+        margin-bottom: 8px;
+    }
+
+    .book-subjects {
+        font-size: 13px;
+        color: #555;
+        line-height: 1.5;
+        max-height: 110px;
+        overflow-y: auto;
+        text-align: justify;
+        padding-right: 6px;
+    }
+
+    .book-subjects::-webkit-scrollbar {
+        width: 6px;
+    }
+    .book-subjects::-webkit-scrollbar-thumb {
+        background-color: #ccc;
+        border-radius: 10px;
+    }
+
+    .book-footer {
+        text-align: right;
+        margin-top: 6px;
+        font-size: 13px;
+        color: #28a745;
+        font-weight: 500;
+    }
+
+    @media (max-width: 700px) {
+        .book-card {
+            flex-direction: column;
+        }
+        .book-cover {
+            width: 100%;
+            height: 220px;
+        }
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    # Header
+    st.markdown("""
+    <div class="books-section">
+        <div class="section-title">Recommended Books</div>
+        <div class="section-divider"></div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # Book list
+    st.markdown('<div class="book-list">', unsafe_allow_html=True)
+
+    for b in books:
+        img_url = b.get("_cover") or "https://via.placeholder.com/200x300?text=No+Cover"
+        title = b.get("title", "(no title)")
+        authors = ", ".join(b.get("author_name", [])[:2])
+        year = b.get("first_publish_year", "N/A")
+        subjects = b.get("_subjects", "—")
+        mood = b.get("_mood", "")
+        link = b.get("_work_url", "")
+
+        st.markdown(f"""
+        <div class="book-card">
+            <img src="{img_url}" class="book-cover" alt="{title}">
+            <div class="book-content">
+                <div>
+                    <div class="book-title">{title}</div>
+                    <div class="book-info">{authors}<br>{year} • {mood} mood</div>
+                    <div class="book-subjects">{subjects}</div>
+                </div>
+                {'<div class="book-footer"><a href="'+link+'" target="_blank" style="color:#28a745;text-decoration:none;">View on Open Library</a></div>' if link else ''}
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    st.markdown("</div>", unsafe_allow_html=True)
