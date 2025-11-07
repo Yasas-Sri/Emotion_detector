@@ -105,11 +105,45 @@ elif detector_choice == "YuNet":
 st.sidebar.header("Emotion Model")
 models_dir = "models"
 os.makedirs(models_dir, exist_ok=True)
-available_models = sorted([f for f in os.listdir(models_dir) if f.lower().endswith((".h5" ,".keras",".pth"))])
+available_cnn = sorted([f for f in os.listdir(models_dir) if f.lower().endswith((".h5" ,".keras"))])
 
-if not available_models:
-    st.sidebar.warning("No .h5 models found in ./models. Save your trained model first.")
-selected_model_name = st.sidebar.selectbox("Pick a trained CNN (.h5)", available_models, index=0 if available_models else None)
+
+
+# Predefined Hugging Face ViT models
+hf_vit_models = {
+    "ViT Emotion Detector v1": "yst007/vit-emotion",
+    # You can add more fine-tuned versions here later:
+    # "ViT Emotion Detector v2": "yourname/vit-emotion-v2",
+}
+
+
+
+model_type_choice = st.sidebar.radio(
+    "Select model type:",
+    ["CNN (.h5 local)", "ViT (Hugging Face)"],
+    index=1
+)
+
+selected_hf_model = None
+selected_local_model = None
+
+if model_type_choice == "CNN (.h5 local)":
+    if not available_cnn:
+        st.sidebar.warning(" No .h5 models found in ./models.")
+    selected_local_model = st.sidebar.selectbox(
+        "Choose CNN model (.h5):", available_cnn, index=0 if available_cnn else None
+    )
+
+else:  # ViT option
+    selected_hf_label = st.sidebar.selectbox("Choose ViT model:", list(hf_vit_models.keys()))
+    selected_hf_model = hf_vit_models[selected_hf_label]
+
+
+
+# if not available_models:
+#     st.sidebar.warning("No .h5 models found in ./models. Save your trained model first.")
+# selected_model_name = st.sidebar.selectbox("Pick a trained CNN (.h5)", available_models, index=0 if available_models else None)
+
 
 # Default class labels (edit if your training used different names/order)
 default_classes = ["Angry", "Disgust", "Fear", "Happy", "Sad", "Surprise", "Neutral"]
@@ -141,10 +175,16 @@ def load_emotion_model(path):
         inp = inp[0]
       _, H, W, C = inp
       return "keras", m, (H, W, C)
-  elif path.endswith(".pth"):
-        vit_model = ViTEmotionModel(path,num_classes=7)
-        # ViT always expects 224×224×3
-        return ("pytorch", vit_model, (224, 224, 3)) 
+#   elif path.endswith(".pth"):
+#         vit_model = ViTEmotionModel(path,num_classes=7)
+#         # ViT always expects 224×224×3
+#         return ("pytorch", vit_model, (224, 224, 3)) 
+  
+  else:
+      vit_model = ViTEmotionModel(model_source)
+      return ("pytorch", vit_model, (224, 224, 3))   
+     
+     
 
 
 
@@ -317,9 +357,21 @@ with col1:
 
 os.makedirs("outputs", exist_ok=True)
 
+rtc_configuration = {
+    "iceServers": [
+        {"urls": ["stun:stun.l.google.com:19302"]},
+        {
+            "urls": ["turn:35.244.33.238:3478"],
+            "username": "appuser",
+            "credential": "strongpassword123"
+        }
+    ]
+}
+
 ctx = webrtc_streamer(
     key="face-emotion",
     mode=WebRtcMode.SENDRECV,
+    rtc_configuration=rtc_configuration,
     video_processor_factory=FaceProcessor,
     media_stream_constraints={"video": True, "audio": False},
 )
@@ -365,11 +417,17 @@ if ctx and ctx.video_processor:
 
 
 
-    if selected_model_name:
-     model_path = os.path.join(models_dir, selected_model_name)
-     try:
+    # if selected_model_name:
+    #  model_path = os.path.join(models_dir, selected_model_name)
+    if model_type_choice == "CNN (.h5 local)" and selected_local_model:
+        model_source = os.path.join(models_dir, selected_local_model)
+    elif model_type_choice == "ViT (Hugging Face)" and selected_hf_model:
+        model_source = selected_hf_model
+    else:
+        raise ValueError("No model selected!")
+    try:
         # Load either CNN (.h5/.keras) or ViT (.pth)
-        model_type, model_obj, inp_hw_c = load_emotion_model(model_path)
+        model_type, model_obj, inp_hw_c = load_emotion_model(model_source)
 
         # Send the model to the processor
         ctx.video_processor.emotion_model = model_obj
@@ -386,11 +444,11 @@ if ctx and ctx.video_processor:
         )
 
         st.success(
-            f"Loaded {model_type.upper()} model: {selected_model_name} | Expecting input: {inp_hw_c}"
+            f"Loaded {model_type.upper()} model: {model_source} | Expecting input: {inp_hw_c}"
         )
 
-     except Exception as e:
-        st.error(f"Failed to load {selected_model_name}: {e}")
+    except Exception as e:
+        st.error(f"Failed to load {model_source}: {e}")
         
         # Create an infinite loop to update the chart
     # NEW: Check if the 'show_graph' toggle is on
