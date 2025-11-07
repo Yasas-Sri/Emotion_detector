@@ -158,14 +158,154 @@ def recommend_from_probs(
     return ranked[:20]
 
 
-def show_movies(movies: List[dict], ncols: int = 4, img_base: str = "https://image.tmdb.org/t/p/w342"):
-    cols = st.columns(ncols)
-    for i, m in enumerate(movies):
-        with cols[i % ncols]:
-            poster = m.get("poster_path")
-            if poster:
-                st.image(f"{img_base}{poster}", use_container_width=True)
-            st.markdown(f"**{m.get('title','(no title)')}**")
-            st.caption(f"{m.get('release_date','')} • ⭐ {m.get('vote_average',0):.1f} • {m.get('_mood','')}")
-            overview = (m.get("overview") or "")
-            st.write((overview[:160] + "…") if len(overview) > 160 else overview)
+
+
+def show_movies(movies: List[dict], img_base: str = "https://image.tmdb.org/t/p/w342"):
+    st.markdown("""
+    <style>
+    .movies-section {
+        width: 100%;
+        margin-top: 20px;
+    }
+
+    .section-title {
+        text-align: center;
+        font-size: 22px;
+        font-weight: bold;
+        margin-bottom: 8px;
+        color: #222;
+    }
+
+    .section-divider {
+        height: 2px;
+        width: 100%;
+        background: linear-gradient(to right, #007bff40, #007bff90, #007bff40);
+        margin-bottom: 20px;
+        border-radius: 2px;
+    }
+
+    .movie-list {
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+        padding: 10px;
+        width: 100%;
+    }
+
+    .movie-card {
+        display: flex;
+        flex-direction: row;
+        background-color: #f9f9f9;
+        border-radius: 16px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        overflow: hidden;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+        width: 100%;
+    }
+
+    .movie-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+    }
+
+    .movie-poster {
+        flex: 0 0 100px;
+        height: 200px;
+        object-fit: cover;
+    }
+
+    .movie-content {
+        flex: 1;
+        padding: 10px 14px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .movie-title {
+        font-weight: 700;
+        font-size: 16px;
+        color: #111;
+        margin-bottom: 4px;
+    }
+
+    .movie-info {
+        color: #444;
+        font-size: 14px;
+        margin-bottom: 10px;
+    }
+
+    .movie-overview {
+        font-size: 13px;
+        color: #555;
+        text-align: justify;
+        line-height: 1.5;
+        flex-grow: 1;
+        overflow-y: auto;
+        padding-right: 6px;
+    }
+
+    .movie-overview::-webkit-scrollbar {
+        width: 6px;
+    }
+    .movie-overview::-webkit-scrollbar-thumb {
+        background-color: #ccc;
+        border-radius: 10px;
+    }
+
+    .movie-footer {
+        text-align: right;
+        margin-top: 10px;
+        font-size: 13px;
+        color: #007bff;
+        font-weight: 500;
+    }
+
+    @media (max-width: 700px) {
+        .movie-card {
+            flex-direction: column;
+        }
+        .movie-poster {
+            width: 100%;
+            height: 280px;
+        }
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    # Header
+    st.markdown("""
+    <div class="movies-section">
+        <div class="section-title"> Recommended Movies</div>
+        <div class="section-divider"></div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # Movie list
+    st.markdown('<div class="movie-list">', unsafe_allow_html=True)
+
+    for m in movies:
+        poster = m.get("poster_path")
+        img_url = f"{img_base}{poster}" if poster else "https://via.placeholder.com/300x450?text=No+Image"
+        title = m.get("title", "(no title)")
+        year = m.get("release_date", "N/A")[:4]
+        rating = m.get("vote_average", 0)
+        mood = m.get("_mood", "")
+        overview = m.get("overview", "No description available.")
+        short_text = overview[:600] + "..." if len(overview) > 600 else overview
+
+        st.markdown(f"""
+        <div class="movie-card">
+            <img src="{img_url}" class="movie-poster" alt="{title}">
+            <div class="movie-content">
+                <div>
+                    <div class="movie-title">{title} ({year})</div>
+                    <div class="movie-info"> {rating:.1f} | {mood} mood</div>
+                    <div class="movie-overview">{short_text}</div>
+                </div>
+                <div class="movie-footer">TMDb • Recommended by emotion model</div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    st.markdown("</div>", unsafe_allow_html=True)

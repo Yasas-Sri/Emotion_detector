@@ -120,16 +120,16 @@ hf_vit_models = {
 
 model_type_choice = st.sidebar.radio(
     "Select model type:",
-    ["CNN (.h5 local)", "ViT (Hugging Face)"],
-    index=1
+    ["CNN", "ViT (Hugging Face)"],
+    index=0
 )
 
 selected_hf_model = None
 selected_local_model = None
 
-if model_type_choice == "CNN (.h5 local)":
+if model_type_choice == "CNN":
     if not available_cnn:
-        st.sidebar.warning(" No .h5 models found in ./models.")
+        st.sidebar.warning(" No CNN models found in ./models.")
     selected_local_model = st.sidebar.selectbox(
         "Choose CNN model (.h5):", available_cnn, index=0 if available_cnn else None
     )
@@ -350,7 +350,7 @@ class FaceProcessor(VideoProcessorBase):
         self.last_frame_bgr = img.copy()
         return av.VideoFrame.from_ndarray(img, format="bgr24")
 
-# ---------------- UI + WebRTC ----------------
+# UI + WebRTC 
 col1, col2 = st.columns(2)
 with col1:
     st.write("Click **Start** below to allow camera access.")
@@ -391,7 +391,7 @@ if ctx and ctx.video_processor:
     emo_labels = st.session_state.get("emo_classes", ["Angry", "Disgust", "Fear", "Happy", "Sad", "Surprise", "Neutral"])
 
     # Start a live updating chart in the right column
-    # st.markdown("### 📈 Real-Time Emotion Graph")
+    # st.markdown("###  Real-Time Emotion Graph")
     # chart_placeholder = st.empty()
 
 
@@ -419,7 +419,7 @@ if ctx and ctx.video_processor:
 
     # if selected_model_name:
     #  model_path = os.path.join(models_dir, selected_model_name)
-    if model_type_choice == "CNN (.h5 local)" and selected_local_model:
+    if model_type_choice == "CNN" and selected_local_model:
         model_source = os.path.join(models_dir, selected_local_model)
     elif model_type_choice == "ViT (Hugging Face)" and selected_hf_model:
         model_source = selected_hf_model
@@ -444,7 +444,7 @@ if ctx and ctx.video_processor:
         )
 
         st.success(
-            f"Loaded {model_type.upper()} model: {model_source} | Expecting input: {inp_hw_c}"
+            f"Loaded {model_type.upper()} model: {model_source} "
         )
 
     except Exception as e:
@@ -529,10 +529,16 @@ col1, col2 = st.columns(2)
 with col1:
  st.subheader(" Mood-Based Movie Picks")
  rec_mode = st.radio("Movie Style", ["match", "lift"], index=0,horizontal=True)
- get_recs = st.button("Get Movie Recommendations")  # <--- BUTTON
+ get_recs = st.button("Get Movie Recommendations")  
+
+with col2:
+ st.subheader(" Mood-Based Book Picks")
+ book_mode = st.radio("Book style", ["match", "lift"], index=0, horizontal=True)
+ get_book_recs = st.button("Get Book Recommendations")
 
 
- if get_recs:
+
+if get_recs:
     if ctx and ctx.video_processor:
         probs = ctx.video_processor.last_probs
         label_now = ctx.video_processor.last_label
@@ -556,18 +562,14 @@ with col1:
             if not movies:
                 st.warning("No movies found. Try a different mode/region or lower Min Votes.")
             else:
-                show_movies(movies, ncols=4)
+                show_movies(movies)
     else:
         st.warning("Start the camera first, then click the button.")
 
 
 
-with col2:
- st.subheader(" Mood-Based Book Picks")
- book_mode = st.radio("Book style", ["match", "lift"], index=0, horizontal=True)
- get_book_recs = st.button("Get Book Recommendations")
 
- if get_book_recs:
+if get_book_recs:
     if ctx and ctx.video_processor:
         probs = ctx.video_processor.last_probs
         label_now = ctx.video_processor.last_label
@@ -587,6 +589,6 @@ with col2:
             if not books:
                 st.warning("No books found. Try the other style.")
             else:
-                show_books_list(books, ncols=4)
+                show_books_list(books)
     else:
         st.warning("Start the camera first, then click the button.")
