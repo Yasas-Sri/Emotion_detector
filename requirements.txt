@@ -4,4 +4,12 @@ scikit-learn
 matplotlib
 seaborn
 tensorflow
-opencv-python
+
+streamlit>=1.33
+streamlit-webrtc>=0.47
+opencv-python-headless>=4.10
+av>=11
+dotenv
+transformers
+torch
+torchvision
