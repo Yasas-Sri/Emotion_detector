@@ -189,3 +189,7 @@ validation_features.csv
 /workspaces/Emotion_detector/notebooks/FC110533_Dulith/base_model/preprocessed_data
 
 
+
+# Ignore large preprocessed arrays
+notebooks/FC110533_Dulith/base_model/preprocessed_data/train/images.npy
+notebooks/FC110533_Dulith/base_model/preprocessed_data/validation/images.npy

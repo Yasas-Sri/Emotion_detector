@@ -1,0 +1,26 @@
+{
+  "num_samples": 28821,
+  "num_classes": 7,
+  "class_names": [
+    "angry",
+    "disgust",
+    "fear",
+    "happy",
+    "neutral",
+    "sad",
+    "surprise"
+  ],
+  "image_shape": [
+    227,
+    227,
+    3
+  ],
+  "scale_0_1": true,
+  "z_score": true,
+  "equalize": true,
+  "repeat_to_rgb": true,
+  "image_size": [
+    227,
+    227
+  ]
+}
