@@ -23,7 +23,7 @@ A sophisticated real-time emotion detection application that uses computer visio
 - **Emotion Recognition**:
   - 7 emotion classes: Angry, Disgust, Fear, Happy, Sad, Surprise, Neutral
   - Multiple model support: Keras (.h5/.keras) and PyTorch (.pth)
-  - Support for CNN architectures (Mini-Xception, EfficientNet, MobileNet, VGG, ResNet)
+  - Support for CNN architectures (Mini-Xception, Alexnet, MobileNet, VGG, ResNet)
   - Vision Transformer (ViT) support for advanced emotion detection
   
 - **Live Visualization**:
@@ -197,6 +197,7 @@ Emotion_detector/
 - **MobileNet**: Mobile-optimized architecture
 - **VGG**: Classic deep CNN architecture
 - **ResNet**: Residual network (small variant for 48×48 images)
+- **AlexNet**: architecture based on alexnet
 
 #### PyTorch Models (.pth)
 - **Vision Transformer (ViT)**: State-of-the-art transformer architecture
@@ -271,13 +272,4 @@ The emotion detection models are trained on standard emotion recognition dataset
 - Yasas (FC211035)
 - Maheshi (fc211019)
 
-##  Acknowledgments
 
-- OpenCV for computer vision functionality
-- Streamlit for the web interface
-- TMDB for movie data
-- Open Library for book data
-- Hugging Face Transformers for ViT implementation
-
-
-**Note**: This project requires a webcam for real-time emotion detection. Ensure camera permissions are granted in your browser
